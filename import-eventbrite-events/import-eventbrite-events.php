@@ -3,7 +3,7 @@
  * Plugin Name:       Import Eventbrite Events
  * Plugin URI:        http://xylusthemes.com/plugins/import-eventbrite-events/
  * Description:       Import Eventbrite Events allows you to import Eventbrite (eventbrite.com) events into your WordPress site.
- * Version:           1.7.5
+ * Version:           1.7.6
  * Author:            Xylus Themes
  * Author URI:        https://xylusthemes.com
  * License:           GPL-2.0+
@@ -33,7 +33,7 @@ if ( ! class_exists( 'Import_Eventbrite_Events' ) ) :
 		 * Import_Eventbrite_Events The one true Import_Eventbrite_Events.
 		 */
 		private static $instance;
-		public $common, $cpt, $eventbrite, $admin, $manage_import, $iee, $tec, $em, $eventon, $event_organizer, $aioec, $my_calendar, $ee4, $common_pro, $cron, $eventbrite_pro;
+		public $common, $cpt, $eventbrite, $admin, $manage_import, $iee, $tec, $em, $eventon, $event_organizer, $aioec, $my_calendar, $ee4, $common_pro, $cron, $eventbrite_pro, $eventprime;
 
 		/**
 		 * Main Import Eventbrite Events Instance.
@@ -73,6 +73,7 @@ if ( ! class_exists( 'Import_Eventbrite_Events' ) ) :
 				self::$instance->tec             = new Import_Eventbrite_Events_TEC();
 				self::$instance->em              = new Import_Eventbrite_Events_EM();
 				self::$instance->eventon         = new Import_Eventbrite_Events_EventON();
+				self::$instance->eventprime      = new Import_Eventbrite_Events_EventPrime();
 				self::$instance->event_organizer = new Import_Eventbrite_Events_Event_Organizer();
 				self::$instance->aioec           = new Import_Eventbrite_Events_Aioec();
 				self::$instance->my_calendar     = new Import_Eventbrite_Events_My_Calendar();
@@ -101,7 +102,7 @@ if ( ! class_exists( 'Import_Eventbrite_Events' ) ) :
 		 * @since 1.0.0
 		 */
 		public function __clone() {
-			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'import-eventbrite-events' ), '1.7.5' );
+			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'import-eventbrite-events' ), '1.7.6' );
 		}
 
 		/**
@@ -110,7 +111,7 @@ if ( ! class_exists( 'Import_Eventbrite_Events' ) ) :
 		 * @since 1.0.0
 		 */
 		public function __wakeup() {
-			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'import-eventbrite-events' ), '1.7.5' );
+			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'import-eventbrite-events' ), '1.7.6' );
 		}
 
 
@@ -125,12 +126,12 @@ if ( ! class_exists( 'Import_Eventbrite_Events' ) ) :
 
 			// Plugin version.
 			if ( ! defined( 'IEE_VERSION' ) ) {
-				define( 'IEE_VERSION', '1.7.5' );
+				define( 'IEE_VERSION', '1.7.6' );
 			}
 
 			// Minimum Pro plugin version.
 			if ( ! defined( 'IEE_MIN_PRO_VERSION' ) ) {
-				define( 'IEE_MIN_PRO_VERSION', '1.7.2' );
+				define( 'IEE_MIN_PRO_VERSION', '1.7.3' );
 			}
 
 			// Plugin folder Path.
@@ -186,6 +187,7 @@ if ( ! class_exists( 'Import_Eventbrite_Events' ) ) :
 			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-tec.php';
 			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-em.php';
 			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-eventon.php';
+			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-eventprime.php';
 			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-event_organizer.php';
 			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-aioec.php';
 			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-my-calendar.php';
@@ -231,7 +233,17 @@ if ( ! class_exists( 'Import_Eventbrite_Events' ) ) :
 					esc_html__( 'Docs', 'import-eventbrite-events' )
 				),
 			);
-			return array_merge( $links, $iee_setting_doc_link );
+			
+			$upgrate_to_pro = array();
+			if( !iee_is_pro() ){
+				$upgrate_to_pro = array( 'iee-event-pro-link' => sprintf(
+                    '<a href="%s" target="_blank" style="color:#1da867;font-weight: 900;">%s</a>',
+                    esc_url( 'https://xylusthemes.com/plugins/import-eventbrite-events/' ),
+                    esc_html__( 'Upgrade to Pro', 'import-eventbrite-events' )
+                ) ) ;
+			}
+
+			return array_merge( $links, $iee_setting_doc_link, $upgrate_to_pro );
 		}
 
 		/**
