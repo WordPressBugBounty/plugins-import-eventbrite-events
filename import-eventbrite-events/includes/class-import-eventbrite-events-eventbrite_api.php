@@ -13,9 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Import_Eventbrite_Events_Eventbrite {
+class Import_Eventbrite_Events_Eventbrite_API {
 
-	public $oauth_token;
+	public $using_standard_api;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -25,7 +25,7 @@ class Import_Eventbrite_Events_Eventbrite {
 	public function __construct() {
 		global $iee_events;
 		$options           = iee_get_import_options( 'eventbrite' );
-		$this->oauth_token = isset( $options['eventbrite_oauth_token'] ) ? $options['eventbrite_oauth_token'] : '';
+		$this->using_standard_api = isset( $options['using_standard_api'] ) ? $options['using_standard_api'] : '';
 	}
 
 	/**
@@ -38,15 +38,19 @@ class Import_Eventbrite_Events_Eventbrite {
 	public function import_event_by_event_id( $event_data = array() ) {
 		global $iee_errors, $iee_events;
 		$options                = iee_get_import_options( 'eventbrite' );
-		$eventbrite_oauth_token = isset( $options['eventbrite_oauth_token'] ) ? $options['eventbrite_oauth_token'] : '';
 		$eventbrite_id          = isset( $event_data['eventbrite_event_id'] ) ? $event_data['eventbrite_event_id'] : 0;
 
-		if ( ! $eventbrite_id || $this->oauth_token == '' ) {
-			$iee_errors[] = __( 'Please insert Eventbrite "Personal OAuth token".', 'import-eventbrite-events' );
+		if ( ! $eventbrite_id ) {
+			$iee_errors[] = __( 'Eventbrite Event ID is required to fetch the event.', 'import-eventbrite-events' );
 			return;
 		}
 
-		$eventbrite_api_url  = 'https://www.eventbriteapi.com/v3/events/' . $eventbrite_id . '/?expand=venue,ticket_availability,organizer,organizer.logo,category&token=' . $this->oauth_token;
+		if ( $this->using_standard_api !== 'yes' ) {
+			$iee_errors[] = __( 'Please enable Standard API option to fetch the event.', 'import-eventbrite-events' );
+			return;
+		}
+
+		$eventbrite_api_url  = 'https://www.eventbrite.com/api/v3/events/' . $eventbrite_id . '/?expand=venue,ticket_availability,organizer,organizer.logo,category';
 		$eventbrite_response = wp_remote_get( $eventbrite_api_url, array( 'headers' => array( 'Content-Type' => 'application/json' ) ) );
 
 		if ( is_wp_error( $eventbrite_response ) ) {
@@ -94,7 +98,7 @@ class Import_Eventbrite_Events_Eventbrite {
 		}
 
 		$description = '';
-		$eventbrite_desc_url  = 'https://www.eventbriteapi.com/v3/events/' . $eventbrite_id . '/description/?token=' . $this->oauth_token;
+		$eventbrite_desc_url  = 'https://www.eventbrite.com/api/v3/events/' . $eventbrite_id . '/description';
 		$eventbrite_response = wp_remote_get( $eventbrite_desc_url, array( 'headers' => array( 'Content-Type' => 'application/json' ) ) );
 		if ( !is_wp_error( $eventbrite_response ) ) {
 			$event_desc = json_decode( wp_remote_retrieve_body($eventbrite_response) );
@@ -176,6 +180,12 @@ class Import_Eventbrite_Events_Eventbrite {
 		$ticket_price      = isset( $eventbrite_event['ticket_availability']['minimum_ticket_price']['major_value'] ) ? $eventbrite_event['ticket_availability']['minimum_ticket_price']['major_value'] : '';	
 		$ticket_currency   = isset( $eventbrite_event['ticket_availability']['minimum_ticket_price']['currency'] ) ? $eventbrite_event['ticket_availability']['minimum_ticket_price']['currency'] : '';	
 		$eventbrite_cat    = isset( $eventbrite_event['category']['short_name'] ) ? $eventbrite_event['category']['short_name'] : '';	
+
+		$ct_ids = '';
+		$get_collections = $this->get_iee_collections( $eventbrite_event['id'] );
+		if( !empty( $get_collections ) ){
+			$ct_ids = $iee_events->common->sync_event_collection( $get_collections );
+		}
 
 		$xt_event = array(
 			'origin'          => 'eventbrite',
@@ -289,15 +299,7 @@ class Import_Eventbrite_Events_Eventbrite {
 			return;
 		}
 
-		$get_oraganizer = wp_remote_get(
-			'https://www.eventbriteapi.com/v3/organizers/' . $organizer_id . '/?token=' . $this->oauth_token,
-			array(
-				'headers' => array(
-					'Content-Type' => 'application/json'
-				),
-				'timeout' => 20,
-			)
-		);
+		$get_oraganizer = wp_remote_get( 'https://www.eventbrite.com/api/v3/organizers/' . $organizer_id, array( 'headers' => array( 'Content-Type' => 'application/json' ), 'timeout' => 20, ) );
 
 		if ( ! is_wp_error( $get_oraganizer ) ) {
 			$oraganizer = json_decode( $get_oraganizer['body'], true );
@@ -310,5 +312,28 @@ class Import_Eventbrite_Events_Eventbrite {
 			}
 		}
 		return '';
+	}
+
+	/**
+	 * Get collections for event.
+	 *
+	 * @since 1.0.0
+	 * @param int $event_id Eventbrite event ID.
+	 * @return array collections
+	 */
+	public function get_iee_collections( $event_id ){
+
+		$eventbrite_api_url  = 'https://www.eventbrite.com/api/v3/events/' . $event_id . '/collections/public/?expand=image';
+		$ec_response         = wp_remote_get( $eventbrite_api_url, array( 'headers' => array( 'Content-Type' => 'application/json' ) ) );
+
+		if ( is_wp_error( $ec_response ) ) {
+			$iee_errors[] = __( 'Something went wrong, please try again.', 'import-eventbrite-events' );
+			return;
+		}
+
+		
+		$eventbrite_collections = json_decode( $ec_response['body'], true );
+		$e_collections = isset( $eventbrite_collections['collections'] ) ? $eventbrite_collections['collections'] : '';
+		return $e_collections;
 	}
 }

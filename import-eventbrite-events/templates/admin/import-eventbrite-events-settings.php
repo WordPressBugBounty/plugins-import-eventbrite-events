@@ -7,6 +7,9 @@ global $iee_events;
 $iee_options        = get_option( IEE_OPTIONS );
 $eventbrite_options = isset( $iee_options ) ? $iee_options : array();
 $iee_google_maps_api_key = get_option( 'iee_google_maps_api_key', array() );
+
+$iee_ap_options       = get_option( IEE_AP_OPTIONS );
+$eventbrite_optionsap = isset( $iee_ap_options ) ? $iee_ap_options : array();
 ?>
 
 <div class="iee-card" style="margin-top:20px;" >
@@ -20,6 +23,9 @@ $iee_google_maps_api_key = get_option( 'iee_google_maps_api_key', array() );
 								<div class="var-tabs__tab-wrap var-tabs--layout-horizontal iee_nav_tabs">
 									<a href="javascript:void(0)" class="var-tab var-tab--active iee_tab_link"  data-tab="settings">
 										<span class="tab-label"><?php esc_attr_e( 'General Settings', 'import-eventbrite-events' ); ?></span>
+									</a>
+									<a href="javascript:void(0)" class="var-tab var-tab--inactive iee_tab_link"  data-tab="appearance">
+										<span class="tab-label"><?php esc_attr_e( 'Appearance', 'import-eventbrite-events' ); ?></span>
 									</a>
 									<a href="javascript:void(0)"  class="var-tab var-tab--inactive iee_tab_link" data-tab="google_maps_key" >
 										<span class="tab-label"><?php esc_attr_e( 'Google Maps API', 'import-eventbrite-events' ); ?></span>
@@ -40,6 +46,33 @@ $iee_google_maps_api_key = get_option( 'iee_google_maps_api_key', array() );
 						<div class="iee_container">
 							<div class="iee_row">
 								<form method="post" id="iee_setting_form">
+
+									<div class="iee-inner-main-section iee-new-feature" >
+                                        <div class="iee-inner-section-1" >
+                                            <span class="iee-title-text">
+												<?php esc_attr_e( 'Import Event With Standard API', 'import-eventbrite-events' ); ?>
+												<br/>
+												<?php esc_attr_e( '(No Private Token Required)', 'import-eventbrite-events' ); ?>
+											</span>
+                                        </div>
+                                        <div class="iee-inner-section-2" >
+                                            <?php
+                                                $using_standard_api = isset( $eventbrite_options['using_standard_api'] ) ? $eventbrite_options['using_standard_api'] : 'no';
+                                            ?>
+                                            <input type="checkbox" name="eventbrite[using_standard_api]" value="yes" <?php if( $using_standard_api == 'yes' ) { echo 'checked="checked"'; } ?> />
+                                            <span class="iee_small">
+                                                <strong><?php esc_attr_e( 'Using "Import Event With Standard API" lets you fetch events directly. No Eventbrite private token is required.', 'import-eventbrite-events' ); ?></strong>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="iee-inner-main-section" >
+                                        <div class="eventbrite_or_keyandsecrate">
+                                            <span class="iee-title-text" ><?php esc_attr_e( '- OR -', 'import-eventbrite-events' ); ?></span>
+                                        </div>
+                                    </div> 
+
+
 									<div class="iee-inner-main-section"  >
 										<div class="iee-inner-section-1" >
 											<span class="iee-title-text" ><?php esc_attr_e( 'Eventbrite Private token', 'import-eventbrite-events' ); ?></span> 
@@ -93,13 +126,28 @@ $iee_google_maps_api_key = get_option( 'iee_google_maps_api_key', array() );
 
 									<div class="iee-inner-main-section"  >
 										<div class="iee-inner-section-1" >
+											<span class="iee-title-text" ><?php esc_attr_e( 'Automatically Import and Assign Eventbrite Categories', 'import-eventbrite-events' ); ?></span>
+										</div>
+										<div class="iee-inner-section-2">
+											<?php
+											$eventbritre_category = isset( $eventbrite_options['eventbritre_category'] ) ? $eventbrite_options['eventbritre_category'] : 'no';
+											?>
+											<input type="checkbox" name="eventbrite[eventbritre_category]" value="yes" <?php if ( $eventbritre_category == 'yes' ) { echo 'checked="checked"'; } ?> />
+											<span class="iee_small">
+												<?php esc_html_e( 'Enable this option to automatically import Eventbrite categories and assign them in events.', 'import-eventbrite-events' ); ?>
+											</span>
+										</div>
+									</div>
+
+									<div class="iee-inner-main-section"  >
+										<div class="iee-inner-section-1" >
 											<span class="iee-title-text" ><?php esc_attr_e( 'Move past events in trash', 'import-eventbrite-events' ); ?></span>
 										</div>
 										<div class="iee-inner-section-2">
 											<?php
-											$update_eventbrite_events = isset( $eventbrite_options['move_peit'] ) ? $eventbrite_options['move_peit'] : 'no';
+											$move_peit = isset( $eventbrite_options['move_peit'] ) ? $eventbrite_options['move_peit'] : 'no';
 											?>
-											<input type="checkbox" name="eventbrite[move_peit]" value="yes" <?php if ( $update_eventbrite_events == 'yes' ) { echo 'checked="checked"'; } ?> />
+											<input type="checkbox" name="eventbrite[move_peit]" value="yes" <?php if ( $move_peit == 'yes' ) { echo 'checked="checked"'; } ?> />
 											<span class="iee_small">
 												<?php esc_attr_e( 'Check to move past events in the trash, Automatically move events to the trash 24 hours after their end date using wp-cron. This runs once daily in the background.', 'import-eventbrite-events' ); ?>
 											</span>
@@ -184,18 +232,31 @@ $iee_google_maps_api_key = get_option( 'iee_google_maps_api_key', array() );
 										</div>
 									</div>
 
-									<div class="iee-inner-main-section"  >
-										<div class="iee-inner-section-1" >
-											<span class="iee-title-text" ><?php esc_attr_e( 'Import Private Events', 'import-eventbrite-events' ); ?></span>
+									<?php
+									$private_events     = isset( $eventbrite_options['private_events'] ) ? $eventbrite_options['private_events'] : 'no';
+									$using_standard_api = isset( $eventbrite_options['using_standard_api'] ) ? $eventbrite_options['using_standard_api'] : 'no';
+									$disable_section    = ! iee_is_pro() || $using_standard_api == 'yes';
+									?>
+
+									<div class="iee-inner-main-section" <?php echo $disable_section ? 'style="opacity:0.5; pointer-events:none;"' : ''; ?>>
+										<div class="iee-inner-section-1">
+											<span class="iee-title-text"><?php esc_attr_e( 'Import Private Events', 'import-eventbrite-events' ); ?></span>
 										</div>
 										<div class="iee-inner-section-2">
-											<?php
-											$private_events = isset( $eventbrite_options['private_events'] ) ? $eventbrite_options['private_events'] : 'no';
-											?>
-											<input type="checkbox" name="eventbrite[private_events]" value="yes" <?php if ( $private_events == 'yes' ) { echo 'checked="checked"'; } if ( ! iee_is_pro() ) { echo 'disabled="disabled"'; } ?> />
+											<input type="checkbox" name="eventbrite[private_events]" value="yes"
+												<?php 
+												if ( $private_events == 'yes' ) { echo 'checked="checked"'; } 
+												if ( $disable_section ) { echo 'disabled="disabled"'; } 
+												?> 
+											/>
 											<span class="iee_small">
 												<?php esc_attr_e( 'Tick to import Private events, Untick to not import private event.', 'import-eventbrite-events' ); ?>
 											</span>
+											<?php if ( $disable_section ): ?>
+												<div class="iee_notice" style="margin-top:5px; color:#d63638; font-size:13px;">
+													<?php esc_html_e( 'This option only works with a eventbrite private token.', 'import-eventbrite-events' ); ?>
+												</div>
+											<?php endif; ?>
 											<?php do_action( 'iee_render_pro_notice' ); ?>
 										</div>
 									</div>
@@ -298,6 +359,63 @@ $iee_google_maps_api_key = get_option( 'iee_google_maps_api_key', array() );
 										<?php wp_nonce_field( 'iee_setting_form_nonce_action', 'iee_setting_form_nonce' ); ?>
 										<input type="submit" class="iee_button" style=""  value="<?php esc_attr_e( 'Save Settings', 'import-eventbrite-events' ); ?>" />
 									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+
+					<div id="appearance" class="iee_tab_content" style="margin-top: 15px;">
+						<div class="iee_container">
+							<div class="iee_row">
+								<form method="post" id="iee_setting_form">
+									<div class="iee-inner-main-section"  >
+										<div class="iee-inner-section-1" >
+											<span class="iee-title-text" ><?php esc_attr_e( 'Ticket Button Text', 'import-eventbrite-events' ); ?></span> 
+										</div>
+										<div class="iee-inner-section-2">
+											<input class="eventbrite_oauth_token iee_input_w25" name="eventbrite_ap[ticket_button_text]" type="text" value="<?php echo esc_html( ! empty( $eventbrite_optionsap['ticket_button_text'] ) ? $eventbrite_optionsap['ticket_button_text'] : __( 'Buy Tickets', 'import-eventbrite-events' ) ); ?>" />
+										</div>
+									</div>
+									
+									<div class="iee-inner-main-section"  >
+										<div class="iee-inner-section-1" >
+											<span class="iee-title-text" ><?php esc_attr_e( 'Next Events Text', 'import-eventbrite-events' ); ?></span> 
+										</div>
+										<div class="iee-inner-section-2">
+											<input class="eventbrite_oauth_token iee_input_w25" name="eventbrite_ap[next_event_text]" type="text" value="<?php echo esc_html( ! empty( $eventbrite_optionsap['next_event_text'] ) ? $eventbrite_optionsap['next_event_text'] : __( 'Next Events', 'import-eventbrite-events' ) ); ?>" />
+										</div>
+									</div>
+
+									<div class="iee-inner-main-section"  >
+										<div class="iee-inner-section-1" >
+											<span class="iee-title-text" ><?php esc_attr_e( 'Previous Events Text', 'import-eventbrite-events' ); ?></span> 
+										</div>
+										<div class="iee-inner-section-2">
+											<input class="eventbrite_oauth_token iee_input_w25" name="eventbrite_ap[previous_event_text]" type="text" value="<?php echo esc_html( ! empty( $eventbrite_optionsap['previous_event_text'] ) ? $eventbrite_optionsap['previous_event_text'] : __( 'Previous Events', 'import-eventbrite-events' ) ); ?>" />
+										</div>
+									</div>
+
+									<div class="iee-inner-main-section"  >
+										<div class="iee-inner-section-1" >
+											<span class="iee-title-text" ><?php esc_attr_e( 'Display Buy Ticket section in Past Event', 'import-eventbrite-events' ); ?></span>
+										</div>
+										<div class="iee-inner-section-2">
+											<?php
+											$sbntb = isset( $eventbrite_optionsap['sbntb'] ) ? $eventbrite_optionsap['sbntb'] : 'no';
+											?>
+											<input type="checkbox" name="eventbrite_ap[sbntb]" value="yes" <?php if ( $sbntb == 'yes' ) { echo 'checked="checked"'; } ?> />
+											<span class="iee_small">
+												<?php esc_attr_e( 'Check to enable show to buy ticket section in past event', 'import-eventbrite-events' ); ?>
+											</span>
+										</div>
+									</div>
+
+									<div class="" style="margin-bottom: 5px;">
+										<input type="hidden" name="iee_ap_action" value="iee_ap_save_settings" />
+										<?php wp_nonce_field( 'iee_ap_setting_form_nonce_action', 'iee_ap_setting_form_nonce' ); ?>
+										<input type="submit" class="iee_button" style=""  value="<?php esc_attr_e( 'Save Settings', 'import-eventbrite-events' ); ?>" />
+									</div>
+
 								</form>
 							</div>
 						</div>
