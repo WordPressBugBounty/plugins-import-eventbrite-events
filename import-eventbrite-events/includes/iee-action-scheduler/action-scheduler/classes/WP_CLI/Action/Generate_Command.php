@@ -1,6 +1,9 @@
 <?php
-
+// phpcs:ignoreFile
 namespace Action_Scheduler\WP_CLI\Action;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 use function \WP_CLI\Utils\get_flag_value;
 

@@ -154,6 +154,51 @@ $eventbrite_optionsap = isset( $iee_ap_options ) ? $iee_ap_options : array();
 										</div>
 									</div>
 
+
+									<div class="iee-inner-main-section"  >
+										<div class="iee-inner-section-1" >
+											<span class="iee-title-text" ><?php esc_attr_e( 'Import Structured Content (Slider Images, Featured Video, FAQs, Lineup)', 'import-eventbrite-events' ); ?></span>
+										</div>
+										<div class="iee-inner-section-2">
+											<?php
+											$import_structured_content = isset( $eventbrite_options['import_structured_content'] ) ? $eventbrite_options['import_structured_content'] : 'no';
+											?>
+											<input type="checkbox" name="eventbrite[import_structured_content]" value="yes" <?php if ( $import_structured_content == 'yes' ) { echo 'checked="checked"'; } ?> />
+											<span class="iee_small">
+												<?php esc_html_e( 'Enable this option to import structured content like slider images, featured video, FAQs, and lineup from Eventbrite. This will make an additional API call per event.', 'import-eventbrite-events' ); ?>
+											</span>
+										</div>
+									</div>
+
+									<div class="iee-inner-main-section"  >
+										<div class="iee-inner-section-1" >
+											<span class="iee-title-text" ><?php esc_attr_e( 'Import Promo/Discount Codes', 'import-eventbrite-events' ); ?></span>
+										</div>
+										<div class="iee-inner-section-2">
+											<?php
+											$import_promo_codes = isset( $eventbrite_options['import_promo_codes'] ) ? $eventbrite_options['import_promo_codes'] : 'no';
+											?>
+											<input type="checkbox" name="eventbrite[import_promo_codes]" value="yes" <?php if ( $import_promo_codes == 'yes' ) { echo 'checked="checked"'; } ?> />
+											<span class="iee_small">
+												<?php esc_html_e( 'Enable this option to import promo/discount codes from Eventbrite. This will make an additional API call per event.', 'import-eventbrite-events' ); ?>
+											</span>
+										</div>
+									</div>
+
+									<div class="iee-inner-main-section"  >
+										<div class="iee-inner-section-1" >
+											<span class="iee-title-text" ><?php esc_attr_e( 'Import Event Collections', 'import-eventbrite-events' ); ?></span>
+										</div>
+										<div class="iee-inner-section-2">
+											<?php
+											$import_collections = isset( $eventbrite_options['import_collections'] ) ? $eventbrite_options['import_collections'] : 'no';
+											?>
+											<input type="checkbox" name="eventbrite[import_collections]" value="yes" <?php if ( $import_collections == 'yes' ) { echo 'checked="checked"'; } ?> />
+											<span class="iee_small">
+												<?php esc_html_e( 'Enable this option to import event collections from Eventbrite. This will make an additional API call per event.', 'import-eventbrite-events' ); ?>
+											</span>
+										</div>
+									</div>
 									<div class="iee-inner-main-section"  >
 										<div class="iee-inner-section-1" >
 											<span class="iee-title-text" ><?php esc_attr_e( 'Move past events in trash', 'import-eventbrite-events' ); ?></span>
@@ -301,6 +346,7 @@ $eventbrite_optionsap = isset( $iee_ap_options ) ? $iee_ap_options : array();
 											$sdontupdate = isset( $dont_update_sc['status'] ) ? $dont_update_sc['status'] : 'no';
 											$cdontupdate = isset( $dont_update_sc['category'] ) ? $dont_update_sc['category'] : 'no';
 											$tdontupdate = isset( $dont_update_sc['tag'] ) ? $dont_update_sc['tag'] : 'no';
+											$scdontupdate = isset( $dont_update_sc['structured_content'] ) ? $dont_update_sc['structured_content'] : 'no';
 											?>
 											<input type="checkbox" name="eventbrite[dont_update][status]" value="yes" <?php checked( $sdontupdate, 'yes' ); disabled( iee_is_pro(), false );?> />
 											<span>
@@ -313,6 +359,10 @@ $eventbrite_optionsap = isset( $iee_ap_options ) ? $iee_ap_options : array();
 											<input type="checkbox" name="eventbrite[dont_update][tag]" value="yes" <?php checked( $tdontupdate, 'yes' ); disabled( iee_is_pro(), false );?> />
 											<span>
 												<?php esc_attr_e( 'Event tag', 'import-eventbrite-events' ); ?>
+											</span><br/>
+											<input type="checkbox" name="eventbrite[dont_update][structured_content]" value="yes" <?php checked( $scdontupdate, 'yes' ); disabled( iee_is_pro(), false );?> />
+											<span>
+												<?php esc_attr_e( 'Structured Content (Video, Gallery, FAQs)', 'import-eventbrite-events' ); ?>
 											</span><br/>
 											<span class="iee_small">
 												<?php esc_attr_e( "Select data which you don't want to update during existing events update. (This is applicable only if you have checked 'update existing events')", 'import-eventbrite-events' ); ?>
@@ -403,6 +453,59 @@ $eventbrite_optionsap = isset( $iee_ap_options ) ? $iee_ap_options : array();
 						<div class="iee_container">
 							<div class="iee_row">
 								<form method="post" id="iee_setting_form">
+									<div class="iee-inner-main-section">
+										<div class="iee-inner-section-1">
+											<span class="iee-title-text"><?php esc_attr_e( 'Single Event Details Layout', 'import-eventbrite-events' ); ?></span>
+										</div>
+										<div class="iee-inner-section-2">
+											<?php
+											$details_layout = isset( $eventbrite_optionsap['details_layout'] ) ? $eventbrite_optionsap['details_layout'] : 'default';
+											$is_pro = iee_is_pro();
+											?>
+											<select name="eventbrite_ap[details_layout]" id="iee_details_layout" class="iee_input_w25">
+												<option value="default" <?php selected( $details_layout, 'default' ); ?>><?php esc_html_e( 'Default Template', 'import-eventbrite-events' ); ?></option>
+												<option value="template2" <?php selected( $details_layout, 'template2' ); ?> <?php echo ! $is_pro ? 'disabled' : ''; ?>><?php esc_html_e( 'Template 2 (Sidebar Layout)', 'import-eventbrite-events' ); ?><?php echo ! $is_pro ? ' — Pro' : ''; ?></option>
+												<option value="template3" <?php selected( $details_layout, 'template3' ); ?> <?php echo ! $is_pro ? 'disabled' : ''; ?>><?php esc_html_e( 'Template 3 (Modern Grid Layout)', 'import-eventbrite-events' ); ?><?php echo ! $is_pro ? ' — Pro' : ''; ?></option>
+												<option value="template4" <?php selected( $details_layout, 'template4' ); ?> <?php echo ! $is_pro ? 'disabled' : ''; ?>><?php esc_html_e( 'Template 4 (Split Screen Layout)', 'import-eventbrite-events' ); ?><?php echo ! $is_pro ? ' — Pro' : ''; ?></option>
+												<option value="template5" <?php selected( $details_layout, 'template5' ); ?> <?php echo ! $is_pro ? 'disabled' : ''; ?>><?php esc_html_e( 'Template 5 (Premium Elegant Layout)', 'import-eventbrite-events' ); ?><?php echo ! $is_pro ? ' — Pro' : ''; ?></option>
+												<option value="template6" <?php selected( $details_layout, 'template6' ); ?> <?php echo ! $is_pro ? 'disabled' : ''; ?>><?php esc_html_e( 'Template 6 (Modern Immersive Layout)', 'import-eventbrite-events' ); ?><?php echo ! $is_pro ? ' — Pro' : ''; ?></option>
+											</select>
+											<br/>
+											<span class="iee_small">
+												<?php esc_attr_e( 'Choose the layout template for the single event details page.', 'import-eventbrite-events' ); ?>
+											</span>
+											<?php if ( ! $is_pro ) : ?>
+											<br/>
+											<span class="iee_small" style="color: #e67e22; font-weight: 600;">
+												<?php /* translators: %s: upgrade link */ ?>
+												🔒 <?php printf( esc_html__( 'Premium templates are available in the Pro version. %s', 'import-eventbrite-events' ), '<a href="https://xylusthemes.com/plugins/import-eventbrite-events/" target="_blank" style="color: #039ED7; font-weight: 700;">' . esc_html__( 'Upgrade to Pro', 'import-eventbrite-events' ) . '</a>' ); ?>
+											</span>
+											<?php endif; ?>
+										</div>
+									</div>
+
+									<?php if ( iee_is_pro() ) : ?>
+									<div class="iee-inner-main-section" id="iee_sidebar_position_select" style="display: <?php echo $details_layout === 'template2' ? 'flex' : 'none'; ?>;">
+										<div class="iee-inner-section-1">
+											<span class="iee-title-text"><?php esc_attr_e( 'Sidebar Position', 'import-eventbrite-events' ); ?></span>
+										</div>
+										<div class="iee-inner-section-2">
+											<?php
+											$sidebar_position = isset( $eventbrite_optionsap['sidebar_position'] ) ? $eventbrite_optionsap['sidebar_position'] : 'right';
+											?>
+											<select name="eventbrite_ap[sidebar_position]" id="iee_sidebar_position" class="iee_input_w25">
+												<option value="right" <?php selected( $sidebar_position, 'right' ); ?>><?php esc_html_e( 'Right Sidebar', 'import-eventbrite-events' ); ?></option>
+												<option value="left" <?php selected( $sidebar_position, 'left' ); ?>><?php esc_html_e( 'Left Sidebar', 'import-eventbrite-events' ); ?></option>
+											</select>
+											<br/>
+											<span class="iee_small">
+												<?php esc_attr_e( 'Choose whether the sidebar should be on the left or the right side.', 'import-eventbrite-events' ); ?>
+											</span>
+										</div>
+									</div>
+
+									<?php endif; // iee_is_pro() ?>
+
 									<div class="iee-inner-main-section"  >
 										<div class="iee-inner-section-1" >
 											<span class="iee-title-text" ><?php esc_attr_e( 'Ticket Button Text', 'import-eventbrite-events' ); ?></span> 

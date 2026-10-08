@@ -1,6 +1,10 @@
 <?php
-
+// phpcs:ignoreFile
 namespace Action_Scheduler\Migration;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 use ActionScheduler_DataController;
 use ActionScheduler_LoggerSchema;

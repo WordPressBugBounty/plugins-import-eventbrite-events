@@ -3,11 +3,12 @@
  * Plugin Name:       Import Eventbrite Events
  * Plugin URI:        http://xylusthemes.com/plugins/import-eventbrite-events/
  * Description:       Import Eventbrite Events allows you to import Eventbrite (eventbrite.com) events into your WordPress site.
- * Version:           1.8.1
+ * Version:           1.8.2
  * Author:            Xylus Themes
  * Author URI:        https://xylusthemes.com
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * Requires at least: 6.0.0
  * Text Domain:       import-eventbrite-events
  * Domain Path:       /languages
  *
@@ -34,7 +35,31 @@ if ( ! class_exists( 'Import_Eventbrite_Events' ) ) :
 		 */
 		private static $instance;
     
-     	public $common, $cpt, $eventbrite, $admin, $manage_import, $iee, $tec, $em, $eventon, $event_organizer, $aioec, $my_calendar, $ee4, $common_pro, $cron, $eventbrite_pro, $eventprime, $elementor_widget, $eventbrite_api, $ajax, $xec, $ical_export, $htmltblock;
+     	public 
+			$common, 
+			$cpt, 
+			$eventbrite, 
+			$admin, 
+			$manage_import, 
+			$iee, 
+			$tec, 
+			$em, 
+			$eventon, 
+			$event_organizer, 
+			$aioec, 
+			$my_calendar, 
+			$ee4, 
+			$common_pro, 
+			$cron, 
+			$eventbrite_pro, 
+			$eventprime, 
+			$elementor_widget, 
+			$eventbrite_api, 
+			$ajax, 
+			$xec, 
+			$ical_export, 
+			$htmltblock, 
+			$blocks;
     
 		/**
 		 * Main Import Eventbrite Events Instance.
@@ -74,14 +99,33 @@ if ( ! class_exists( 'Import_Eventbrite_Events' ) ) :
 					self::$instance->manage_import = new Import_Eventbrite_Events_Manage_Import();
 				}
 				self::$instance->iee             = new Import_Eventbrite_Events_IEE();
-				self::$instance->tec             = new Import_Eventbrite_Events_TEC();
-				self::$instance->em              = new Import_Eventbrite_Events_EM();
-				self::$instance->eventon         = new Import_Eventbrite_Events_EventON();
-				self::$instance->eventprime      = new Import_Eventbrite_Events_EventPrime();
-				self::$instance->event_organizer = new Import_Eventbrite_Events_Event_Organizer();
-				self::$instance->aioec           = new Import_Eventbrite_Events_Aioec();
-				self::$instance->my_calendar     = new Import_Eventbrite_Events_My_Calendar();
-				self::$instance->ee4             = new Import_Eventbrite_Events_EE4();
+				if ( ! function_exists( 'is_plugin_active' ) ) {
+					include_once ABSPATH . 'wp-admin/includes/plugin.php';
+				}
+				if ( is_plugin_active( 'the-events-calendar/the-events-calendar.php' ) ) {
+					self::$instance->tec = new Import_Eventbrite_Events_TEC();
+				}
+				if ( is_plugin_active( 'events-manager/events-manager.php' ) ) {
+					self::$instance->em = new Import_Eventbrite_Events_EM();
+				}
+				if ( is_plugin_active( 'eventon/eventon.php' ) ) {
+					self::$instance->eventon = new Import_Eventbrite_Events_EventON();
+				}
+				if ( is_plugin_active( 'eventprime-event-calendar-management/eventprime.php' ) ) {
+					self::$instance->eventprime = new Import_Eventbrite_Events_EventPrime();
+				}
+				if ( is_plugin_active( 'event-organiser/event-organiser.php' ) ) {
+					self::$instance->event_organizer = new Import_Eventbrite_Events_Event_Organizer();
+				}
+				if ( is_plugin_active( 'all-in-one-event-calendar/all-in-one-event-calendar.php' ) ) {
+					self::$instance->aioec = new Import_Eventbrite_Events_Aioec();
+				}
+				if ( is_plugin_active( 'my-calendar/my-calendar.php' ) ) {
+					self::$instance->my_calendar = new Import_Eventbrite_Events_My_Calendar();
+				}
+				if ( is_plugin_active( 'event-espresso-core-reg/espresso.php' ) ) {
+					self::$instance->ee4 = new Import_Eventbrite_Events_EE4();
+				}
 				self::$instance->ical_export     = new Import_Eventbrite_Events_Ical_Export();
 				self::$instance->xec             = new Import_Eventbrite_Events_XEC();
 
@@ -108,7 +152,7 @@ if ( ! class_exists( 'Import_Eventbrite_Events' ) ) :
 		 * @since 1.0.0
 		 */
 		public function __clone() {
-			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'import-eventbrite-events' ), '1.8.1' );
+			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'import-eventbrite-events' ), '1.8.2' );
 		}
 
 		/**
@@ -117,7 +161,7 @@ if ( ! class_exists( 'Import_Eventbrite_Events' ) ) :
 		 * @since 1.0.0
 		 */
 		public function __wakeup() {
-			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'import-eventbrite-events' ), '1.8.1' );
+			_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'import-eventbrite-events' ), '1.8.2' );
 		}
 
 
@@ -132,12 +176,12 @@ if ( ! class_exists( 'Import_Eventbrite_Events' ) ) :
 
 			// Plugin version.
 			if ( ! defined( 'IEE_VERSION' ) ) {
-				define( 'IEE_VERSION', '1.8.1' );
+				define( 'IEE_VERSION', '1.8.2' );
 			}
 
 			// Minimum Pro plugin version.
 			if ( ! defined( 'IEE_MIN_PRO_VERSION' ) ) {
-				define( 'IEE_MIN_PRO_VERSION', '1.7.8' );
+				define( 'IEE_MIN_PRO_VERSION', '1.7.9' );
 			}
 
 			// Plugin folder Path.
@@ -197,14 +241,33 @@ if ( ! class_exists( 'Import_Eventbrite_Events' ) ) :
 			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-eventbrite.php';
 			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-eventbrite_api.php';
 			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-iee.php';
-			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-tec.php';
-			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-em.php';
-			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-eventon.php';
-			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-eventprime.php';
-			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-event_organizer.php';
-			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-aioec.php';
-			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-my-calendar.php';
-			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-ee4.php';
+			if ( ! function_exists( 'is_plugin_active' ) ) {
+				include_once ABSPATH . 'wp-admin/includes/plugin.php';
+			}
+			if ( is_plugin_active( 'the-events-calendar/the-events-calendar.php' ) ) {
+				require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-tec.php';
+			}
+			if ( is_plugin_active( 'events-manager/events-manager.php' ) ) {
+				require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-em.php';
+			}
+			if ( is_plugin_active( 'eventon/eventon.php' ) ) {
+				require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-eventon.php';
+			}
+			if ( is_plugin_active( 'eventprime-event-calendar-management/eventprime.php' ) ) {
+				require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-eventprime.php';
+			}
+			if ( is_plugin_active( 'event-organiser/event-organiser.php' ) ) {
+				require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-event_organizer.php';
+			}
+			if ( is_plugin_active( 'all-in-one-event-calendar/all-in-one-event-calendar.php' ) ) {
+				require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-aioec.php';
+			}
+			if ( is_plugin_active( 'my-calendar/my-calendar.php' ) ) {
+				require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-my-calendar.php';
+			}
+			if ( is_plugin_active( 'event-espresso-core-reg/espresso.php' ) ) {
+				require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-ee4.php';
+			}
 			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-ical-export.php';
 			require_once IEE_PLUGIN_DIR . 'includes/class-import-eventbrite-events-xec.php';
 			require_once IEE_PLUGIN_DIR . 'includes/class-iee-plugin-deactivation.php';
@@ -333,6 +396,48 @@ $iee_events = run_import_eventbrite_events();
 $iee_errors = $iee_warnings = $iee_success_msg = $iee_info_msg = array();
 
 /**
+ * Default import settings saved on activation.
+ *
+ * Kept in a single place so activation, the default seeder and the settings
+ * save handler all fall back to the same values.
+ *
+ * @since 1.0
+ * @return array
+ */
+function iee_default_options() {
+	return array(
+		// General
+		'using_standard_api'              => 'yes',
+		'eventbrite_oauth_token'          => '',
+		'enable_ticket_sec'               => 'yes',
+		'ticket_model'                    => '0',
+		'update_events'                   => 'yes',
+		'dont_update'                     => 'no',
+		'eventbritre_category'            => 'no',
+		'eventbritre_tags'                => 'no',
+		'import_structured_content'       => 'no',
+		'import_promo_codes'              => 'no',
+		'import_collections'              => 'no',
+		'move_peit'                       => 'no',
+		'skip_trash'                      => 'no',
+		'advanced_sync'                   => 'no',
+		'direct_link'                     => 'no',
+		'deactive_ieevents'               => 'no',
+		'delete_ieedata'                  => 'no',
+
+		// Appearance
+		'accent_color'                    => '#039ED7',
+		'event_slug'                      => 'eventbrite-event',
+		'time_format'                     => '12hours',
+		'small_thumbnail'                 => 'no',
+		'skip_image_import'               => 'no',
+
+		// Standard API only, unset when using the private token.
+		'private_events'                  => 'no',
+	);
+}
+
+/**
  * The code that runs during plugin activation.
  *
  * @since 1.0
@@ -341,15 +446,7 @@ function iee_activate_import_eventbrite_events() {
 	global $iee_events;
 	$iee_events->cpt->register_event_post_type();
 	flush_rewrite_rules();
-	add_option(
-		IEE_OPTIONS,
-		array(
-			'using_standard_api' => 'yes',
-			'enable_ticket_sec'  => 'yes',
-			'ticket_model'       => '0',
-			'update_events'      => 'yes',
-		)
-	);
+	add_option( IEE_OPTIONS, iee_default_options() );
 	add_option( 'iee_plugin_activated', true );
 }
 register_activation_hook( __FILE__, 'iee_activate_import_eventbrite_events' );

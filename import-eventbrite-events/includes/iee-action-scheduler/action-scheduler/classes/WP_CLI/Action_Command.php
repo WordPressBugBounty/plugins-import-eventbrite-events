@@ -1,6 +1,9 @@
 <?php
-
+// phpcs:ignoreFile
 namespace Action_Scheduler\WP_CLI;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Action command for Action Scheduler.

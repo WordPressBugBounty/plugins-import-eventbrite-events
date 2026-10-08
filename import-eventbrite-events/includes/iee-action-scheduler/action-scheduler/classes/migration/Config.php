@@ -1,7 +1,9 @@
 <?php
-
-
+// phpcs:ignoreFile
 namespace Action_Scheduler\Migration;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 use Action_Scheduler\WP_CLI\ProgressBar;
 use ActionScheduler_Logger as Logger;
